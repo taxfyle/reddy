@@ -15,6 +15,8 @@ pub struct Args {
 
 #[derive(Subcommand, Debug)]
 enum Commands {
+    Ping,
+
     /// Get memory used by a set of keys
     MemoryUsage {
         /// Key pattern to use for listing keys
@@ -58,6 +60,24 @@ impl Args {
                         process::exit(1);
                     }
                 }
+            }
+
+            Commands::Ping => {
+                println!("pinging {}", self.url.clone());
+
+                let client = redis::Client::open(self.url.clone())?;
+                let mut con = client.get_connection()?;
+
+                let result = redis::cmd("PING")
+                    .query::<String>(&mut con)
+                    .inspect_err(|err| {
+                        println!("got error pinging redis at {}: {}", self.url.clone(), err);
+                        process::exit(1);
+                    })?;
+
+                println!("ping answer: {}", result);
+
+                Ok(())
             }
         }
     }
