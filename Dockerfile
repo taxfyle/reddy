@@ -1,4 +1,12 @@
-FROM rust:1.78 as builder
+FROM --platform=$BUILDPLATFORM rust:1.78 as builder
+
+# The build platform we are compiling on.
+# Populated by BuildX
+ARG BUILDPLATFORM
+
+# The target platform we are compiling for.
+# Populated by BuildX
+ARG TARGETPLATFORM
 
 # Create a new empty project.
 RUN cargo new --bin reddy
@@ -27,7 +35,7 @@ COPY ./src ./src
 # Build for release
 RUN cargo build --release
 
-FROM ubuntu:latest
+FROM --platform=$TARGETPLATFORM ubuntu:latest
 COPY --from=builder /reddy/target/release/reddy  /usr/local/bin/reddy
 
 CMD ["reddy"]
