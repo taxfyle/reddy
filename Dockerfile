@@ -38,4 +38,4 @@ RUN cargo build --release
 FROM --platform=$TARGETPLATFORM ubuntu:latest
 COPY --from=builder /reddy/target/release/reddy  /usr/local/bin/reddy
 
-ENTRYPOINT ["reddy"]
+CMD ["reddy"]
